@@ -18,7 +18,6 @@ Desktop app (GUI) that downloads SoundCloud tracks, playlists and albums as **re
 |-----------|------------|
 | ![Dark Mode](docs/screenshots/dark.png) | ![Light Mode](docs/screenshots/light.png) |
 
-> Placeholders: put your screenshots into `docs/screenshots/`.
 
 ---
 
