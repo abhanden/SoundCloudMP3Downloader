@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SoundCloud MP3 Downloader – real MP3 with the cover inside</title>
+  <meta name="description" content="Desktop app that downloads SoundCloud tracks and playlists as 320 kbps MP3 and writes artist, title and cover art into the ID3 tags.">
+  <meta name="color-scheme" content="dark">
+  <meta property="og:title" content="SoundCloud MP3 Downloader">
+  <meta property="og:description" content="Real MP3 files with artist, title and cover art embedded. Open source, Python.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23121212'/%3E%3Cpath d='M6 18v-4M11 22V10M16 25V7M21 21V11M26 17v-2' stroke='%23ff5500' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#preview">Skip to content</a>
+
+  <header class="site">
+    <div class="wrap bar-row">
+      <a class="brand" href="#top" id="top">
+        <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 18v-4M11 22V10M16 25V7M21 21V11M26 17v-2" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        <span>SoundCloud MP3 Downloader</span>
+      </a>
+      <nav aria-label="Main">
+        <a href="#preview">Preview</a>
+        <a href="#tags">Tags</a>
+        <a href="#install">Install</a>
+        <a href="#download">Download</a>
+        <a data-link="repo">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="preview">
+      <div class="wrap">
+        <h1>Paste a link. Get the MP3 with its cover inside.</h1>
+        <p class="lead">A desktop app that saves SoundCloud tracks, playlists and albums as 320 kbps MP3 and writes artist, title and cover art into the file. Check the cover below before you install anything.</p>
+
+        <svg id="wave" class="wave" role="img" aria-label="Decorative waveform"></svg>
+
+        <form id="preview-form" novalidate>
+          <label class="sr" for="url">SoundCloud link</label>
+          <div class="field">
+            <input id="url" name="url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://soundcloud.com/artist/track" required>
+            <button class="btn" id="go" type="submit">Show preview</button>
+          </div>
+        </form>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+
+        <div class="result" id="result" hidden>
+          <figure class="cover-box">
+            <img id="cover" alt="Cover art of the track" width="500" height="500">
+            <figcaption id="cover-info"></figcaption>
+            <a class="textlink" id="cover-link" target="_blank" rel="noopener noreferrer" hidden>Open cover image</a>
+          </figure>
+          <div class="result-body">
+            <h2 id="res-title"></h2>
+            <p class="artist" id="res-artist"></p>
+            <dl class="tag-list" aria-label="Tags the app will write">
+              <div><dt>Title</dt><dd id="tag-title"></dd></div>
+              <div><dt>Artist</dt><dd id="tag-artist"></dd></div>
+              <div><dt>Cover</dt><dd id="tag-cover"></dd></div>
+            </dl>
+            <div class="player" id="player"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="tags">
+      <div class="wrap">
+        <h2>A real MP3 with complete tags</h2>
+        <p class="intro">Earlier versions of this kind of tool left M4A files behind and skipped covers. This one converts every track with FFmpeg, then checks the result by reading the tags back from disk.</p>
+
+        <ol class="pipeline">
+          <li><strong>yt-dlp</strong><span>Fetches the best audio stream and the track metadata.</span></li>
+          <li><strong>FFmpeg</strong><span>Converts to MP3 at 320 kbps.</span></li>
+          <li><strong>Pillow</strong><span>Loads the 500 × 500 cover and converts it to a real JPEG.</span></li>
+          <li><strong>mutagen</strong><span>Writes the ID3v2.3 tags and reads them back to verify.</span></li>
+        </ol>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th scope="col">Field</th><th scope="col">ID3 frame</th><th scope="col">Content</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Title</th><td><code>TIT2</code></td><td>Track title from SoundCloud</td></tr>
+              <tr><th scope="row">Artist</th><td><code>TPE1</code></td><td>Artist, or the uploader name if none is set</td></tr>
+              <tr><th scope="row">Album</th><td><code>TALB</code></td><td>Playlist or album title, when you download one</td></tr>
+              <tr><th scope="row">Cover</th><td><code>APIC</code></td><td>Front cover, <code>image/jpeg</code>, <code>t500x500</code> version of the artwork</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">ID3v2.3 and JPEG are deliberate: Windows Explorer and Mp3tag show those covers reliably, WebP covers and ID3v2.4 tags often stay blank.</p>
+      </div>
+    </section>
+
+    <section class="section" id="install">
+      <div class="wrap">
+        <h2>Install</h2>
+        <p class="intro">You need Python 3.9 or newer and FFmpeg. Pick your system.</p>
+        <div class="tabs" id="tabs" role="tablist" aria-label="Operating system"></div>
+        <div id="guide"></div>
+        <noscript>
+          <p class="note">This guide needs JavaScript. The same steps are in the <a href="https://github.com/abhanden/SoundCloudMP3Downloader#installation">README</a>.</p>
+        </noscript>
+      </div>
+    </section>
+
+    <section class="section" id="download">
+      <div class="wrap">
+        <h2>Download</h2>
+        <ul class="downloads">
+          <li>
+            <div><strong>Source ZIP</strong><span>app.py, requirements.txt, README and license in one archive.</span></div>
+            <a class="btn small" data-link="zip">Download ZIP</a>
+          </li>
+          <li>
+            <div><strong>app.py only</strong><span>The single script. Install the packages from requirements.txt first.</span></div>
+            <a class="btn small ghost" data-link="raw" target="_blank" rel="noopener noreferrer">View raw file</a>
+          </li>
+          <li>
+            <div><strong>Releases</strong><span>Compiled builds are listed here once they are published.</span></div>
+            <a class="btn small ghost" data-link="releases" target="_blank" rel="noopener noreferrer">Open releases</a>
+          </li>
+          <li>
+            <div><strong>Source code</strong><span>Issues, pull requests and the full history.</span></div>
+            <a class="btn small ghost" data-link="repo" target="_blank" rel="noopener noreferrer">Open repository</a>
+          </li>
+        </ul>
+        <p class="note">Download only tracks you have the rights to, or that the artist released for download. This project is not affiliated with SoundCloud.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="wrap foot-row">
+      <span>MIT License</span>
+      <span>Built with yt-dlp, FFmpeg, mutagen, CustomTkinter and Pillow</span>
+      <a data-link="repo">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>
