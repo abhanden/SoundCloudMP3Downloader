@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+*.spec
+
+# Virtual envs
+venv/
+.venv/
+env/
+
+# Secrets
+.env
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# App output
+downloads/
+*.mp3
+
+# Local ffmpeg binaries
+ffmpeg.exe
+ffprobe.exe
